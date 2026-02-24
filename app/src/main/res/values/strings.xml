@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">どうぶつさうんど</string>
+    <string name="splash_title">どうぶつさうんど</string>
+    <string name="splash_subtitle">どうぶつをタッチしてね！</string>
+    <string name="main_title">どうぶつさうんど</string>
+
+    <!-- 動物名 -->
+    <string name="animal_dog">いぬ</string>
+    <string name="animal_cat">ねこ</string>
+    <string name="animal_rabbit">うさぎ</string>
+    <string name="animal_lion">らいおん</string>
+    <string name="animal_elephant">ぞう</string>
+    <string name="animal_giraffe">きりん</string>
+
+    <!-- 鳴き声 -->
+    <string name="sound_dog">ワンワン！</string>
+    <string name="sound_cat">ニャーニャー！</string>
+    <string name="sound_rabbit">ぴょんぴょん！</string>
+    <string name="sound_lion">ガオー！</string>
+    <string name="sound_elephant">パオーン！</string>
+    <string name="sound_giraffe">もぐもぐ～</string>
+</resources>

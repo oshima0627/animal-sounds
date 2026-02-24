@@ -1,0 +1,13 @@
+# このディレクトリに動物の鳴き声音声ファイルを配置してください。
+# Place animal sound files (MP3/WAV) in this directory.
+#
+# 必要なファイル:
+# - sound_dog.mp3      (犬の鳴き声: ワンワン)
+# - sound_cat.mp3      (猫の鳴き声: ニャーニャー)
+# - sound_rabbit.mp3   (うさぎの鳴き声)
+# - sound_lion.mp3     (ライオンの鳴き声: ガオー)
+# - sound_elephant.mp3 (ゾウの鳴き声: パオーン)
+# - sound_giraffe.mp3  (キリンの鳴き声)
+#
+# 無料音源: https://freesound.org
+# 音声ファイルがない場合でもアプリは起動しますが、鳴き声は再生されません。
