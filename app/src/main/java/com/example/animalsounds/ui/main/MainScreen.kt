@@ -5,9 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -42,10 +46,12 @@ fun MainScreen(
             .background(Color(0xFFFFF8E1))
     ) {
         // ── ヘッダー ──────────────────────────────────────────────────────────
+        // statusBarsPadding() でステータスバー分の余白を確保（edge-to-edge 対応）
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFFF8F00))
+                .statusBarsPadding()
                 .padding(vertical = 18.dp, horizontal = 16.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -58,18 +64,23 @@ fun MainScreen(
             )
         }
 
-        // ── 動物グリッド（2 列） ──────────────────────────────────────────────
+        // ── 動物グリッド（幅 160dp を最小単位として列数を自動調整）
+        // スマホ縦: 2列 / タブレット横: 3〜4列 と自動的に変化する
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Adaptive(minSize = 160.dp),
             contentPadding = PaddingValues(
                 start = 16.dp,
                 end = 16.dp,
                 top = 16.dp,
+                // navigationBarsPadding 相当をコンテンツ末尾に追加
                 bottom = 24.dp
             ),
+            modifier = Modifier
+                .fillMaxSize()
+                // ナビゲーションバー分の余白（ジェスチャーナビ対応）
+                .windowInsetsPadding(WindowInsets.navigationBars),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize()
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(
                 items = animalViewModel.animals,
