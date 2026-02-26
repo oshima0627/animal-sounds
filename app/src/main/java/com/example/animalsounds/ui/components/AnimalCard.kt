@@ -30,6 +30,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,6 +67,15 @@ fun AnimalCard(
 
     val cardShape = RoundedCornerShape(24.dp)
 
+    // TalkBack 用の読み上げテキスト:
+    //   待機中 → 「いぬ。タップして鳴き声を聞く」
+    //   再生中 → 「いぬ。ワンワン！」
+    val a11yDescription = if (isPlaying) {
+        "${animal.nameJp}。${animal.soundText}"
+    } else {
+        "${animal.nameJp}。タップして鳴き声を聞く"
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -77,6 +90,11 @@ fun AnimalCard(
             )
             .clip(cardShape)
             .background(Color(animal.backgroundColor))
+            // アクセシビリティ: TalkBack 向け読み上げテキストとロール
+            .semantics {
+                contentDescription = a11yDescription
+                role = Role.Button
+            }
             // カード全体がタップ領域（ripple なし：幼児向け）
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },

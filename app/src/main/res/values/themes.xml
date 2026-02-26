@@ -2,7 +2,18 @@
 <resources>
     <!-- Jetpack Compose 使用のため、シンプルな NoActionBar テーマのみ定義 -->
     <style name="Theme.AnimalSounds" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/status_bar</item>
-        <item name="android:navigationBarColor">@color/background_warm</item>
+        <!--
+            起動直後の白フラッシュを防止する。
+            Compose の setContent() が呼ばれるまでの間、Activity ウィンドウには
+            このテーマの windowBackground が表示される。
+            SplashScreen と同じ暖かいオレンジ色にすることで色の変化をなくす。
+        -->
+        <item name="android:windowBackground">@color/splash_background</item>
+        <!--
+            enableEdgeToEdge() が実行時にシステムバーを透過に上書きするため
+            ここでは透過を明示して競合を防ぐ。
+        -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>

@@ -24,4 +24,7 @@
 
     <!-- ステータスバー -->
     <color name="status_bar">#FFE65100</color>
+
+    <!-- スプラッシュ画面と同じ背景色（起動時の白フラッシュ防止用） -->
+    <color name="splash_background">#FFFFE0B2</color>
 </resources>
