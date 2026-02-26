@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- プライマリカラー -->
+    <color name="orange_primary">#FFFF8F00</color>
+    <color name="orange_primary_dark">#FFE65100</color>
+    <color name="orange_primary_light">#FFFFB74D</color>
+
+    <!-- 背景 -->
+    <color name="background_warm">#FFFFF8E1</color>
+    <color name="surface_warm">#FFFFFDE7</color>
+
+    <!-- 動物カード背景色 -->
+    <color name="card_dog">#FFFFD7A8</color>
+    <color name="card_cat">#FFFFB3C6</color>
+    <color name="card_rabbit">#FFD7F0FF</color>
+    <color name="card_lion">#FFFFF0A8</color>
+    <color name="card_elephant">#FFD8D0F0</color>
+    <color name="card_giraffe">#FFF0FFD0</color>
+
+    <!-- テキスト -->
+    <color name="text_dark">#FF3E2723</color>
+    <color name="text_medium">#FF5D4037</color>
+    <color name="text_light">#FF795548</color>
+
+    <!-- ステータスバー -->
+    <color name="status_bar">#FFE65100</color>
+
+    <!-- スプラッシュ画面と同じ背景色（起動時の白フラッシュ防止用） -->
+    <color name="splash_background">#FFFFE0B2</color>
+</resources>
