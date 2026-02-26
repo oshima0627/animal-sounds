@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -38,7 +39,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.animalsounds.R
 import com.example.animalsounds.data.model.Animal
+import com.example.animalsounds.ui.theme.TextDark
+import com.example.animalsounds.ui.theme.TextMedium
 
 /**
  * 動物 1 匹分のカード。
@@ -70,10 +74,11 @@ fun AnimalCard(
     // TalkBack 用の読み上げテキスト:
     //   待機中 → 「いぬ。タップして鳴き声を聞く」
     //   再生中 → 「いぬ。ワンワン！」
+    val tapHint = stringResource(R.string.animal_tap_hint)
     val a11yDescription = if (isPlaying) {
         "${animal.nameJp}。${animal.soundText}"
     } else {
-        "${animal.nameJp}。タップして鳴き声を聞く"
+        "${animal.nameJp}。$tapHint"
     }
 
     Box(
@@ -124,7 +129,7 @@ fun AnimalCard(
                 text = animal.nameJp,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF3E2723),
+                color = TextDark,
                 textAlign = TextAlign.Center
             )
 
@@ -143,7 +148,7 @@ fun AnimalCard(
                     text = animal.soundText,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF5D4037),
+                    color = TextMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 6.dp)
                 )

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,11 +22,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.animalsounds.R
+import com.example.animalsounds.ui.theme.DarkOnBackground
+import com.example.animalsounds.ui.theme.DarkSplashBackground
+import com.example.animalsounds.ui.theme.SplashBackground
+import com.example.animalsounds.ui.theme.TextLight
+import com.example.animalsounds.ui.theme.TextMedium
 import kotlinx.coroutines.delay
 
 /** スプラッシュ表示時間（ミリ秒） */
@@ -35,6 +42,8 @@ private const val SPLASH_DURATION_MS = 2000L
  * スプラッシュ画面。
  * アプリ起動時にロゴとタイトルをバウンスアニメーションで表示し、
  * [SPLASH_DURATION_MS] 後に [onNavigateToMain] を呼ぶ。
+ *
+ * ダークモード時は暖色系ダーク背景に切り替わる。
  */
 @Composable
 fun SplashScreen(onNavigateToMain: () -> Unit) {
@@ -46,10 +55,15 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
         onNavigateToMain()
     }
 
+    val isDark = isSystemInDarkTheme()
+    val bgColor = if (isDark) DarkSplashBackground else SplashBackground
+    val titleColor = if (isDark) DarkOnBackground else TextMedium
+    val subtitleColor = if (isDark) DarkOnBackground.copy(alpha = 0.8f) else TextLight
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFE0B2)),
+            .background(bgColor),
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
@@ -67,7 +81,7 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
             ) {
                 // アプリアイコン代わりの大きな絵文字
                 Text(
-                    text = "🐾",
+                    text = stringResource(R.string.splash_emoji),
                     fontSize = 96.sp,
                     textAlign = TextAlign.Center
                 )
@@ -76,10 +90,10 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
 
                 // アプリタイトル
                 Text(
-                    text = "どうぶつ\nさうんど",
+                    text = stringResource(R.string.splash_title),
                     fontSize = 44.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF5D4037),
+                    color = titleColor,
                     textAlign = TextAlign.Center,
                     lineHeight = 56.sp
                 )
@@ -88,10 +102,10 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
 
                 // サブタイトル
                 Text(
-                    text = "どうぶつをタッチしてね！",
+                    text = stringResource(R.string.splash_subtitle),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF795548),
+                    color = subtitleColor,
                     textAlign = TextAlign.Center
                 )
             }

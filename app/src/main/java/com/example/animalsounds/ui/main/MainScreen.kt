@@ -15,24 +15,27 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.animalsounds.R
 import com.example.animalsounds.ui.components.AnimalCard
 import com.example.animalsounds.viewmodel.AnimalViewModel
 
 /**
  * メイン画面。
  * 動物を 2 列グリッドで表示する。各カードをタップすると鳴き声＋アニメーションが発動する。
+ * ダークモードは MaterialTheme.colorScheme を通じて自動適用される。
  */
 @Composable
 fun MainScreen(
@@ -43,23 +46,23 @@ fun MainScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFF8E1))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // ── ヘッダー ──────────────────────────────────────────────────────────
         // statusBarsPadding() でステータスバー分の余白を確保（edge-to-edge 対応）
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFFF8F00))
+                .background(MaterialTheme.colorScheme.primary)
                 .statusBarsPadding()
                 .padding(vertical = 18.dp, horizontal = 16.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "どうぶつさうんど 🎵",
+                text = stringResource(R.string.main_title),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center
             )
         }
