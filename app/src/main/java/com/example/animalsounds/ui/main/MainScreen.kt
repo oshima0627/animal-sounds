@@ -265,23 +265,29 @@ fun MovingAnimalSprite(
             .offset { IntOffset(displayX.roundToInt(), displayY.roundToInt()) }
             .size(animalSizeDp)
             .rotate(rotation)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            )
     ) {
         if (imageResId != 0) {
             Image(
                 painter = painterResource(id = imageResId),
                 contentDescription = activeAnimal.animal.nameJp,
-                modifier = Modifier.size(if (isTablet) (76 * 4).dp else 76.dp)
+                modifier = Modifier
+                    .size(if (isTablet) (76 * 4).dp else 76.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick
+                    )
             )
         } else {
             Text(
                 text = activeAnimal.animal.emoji,
                 fontSize = if (isTablet) (64 * 4).sp else 64.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick
+                )
             )
         }
     }
