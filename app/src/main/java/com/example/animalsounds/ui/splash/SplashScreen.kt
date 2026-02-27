@@ -13,6 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,20 +36,14 @@ import androidx.compose.ui.unit.sp
 import com.example.animalsounds.R
 import com.example.animalsounds.ui.theme.DarkOnBackground
 import com.example.animalsounds.ui.theme.DarkSplashBackground
+import com.example.animalsounds.ui.theme.OrangePrimary
 import com.example.animalsounds.ui.theme.SplashBackground
-import com.example.animalsounds.ui.theme.TextLight
 import com.example.animalsounds.ui.theme.TextMedium
-import kotlinx.coroutines.delay
-
-/** スプラッシュ表示時間（ミリ秒） */
-private const val SPLASH_DURATION_MS = 2000L
 
 /**
- * スプラッシュ画面。
- * アプリ起動時にロゴとタイトルをバウンスアニメーションで表示し、
- * [SPLASH_DURATION_MS] 後に [onNavigateToMain] を呼ぶ。
- *
- * ダークモード時は暖色系ダーク背景に切り替わる。
+ * タイトル画面。
+ * ロゴとタイトルをアニメーションで表示し、大きな「スタート」ボタンを表示する。
+ * ボタンを押すとゲーム画面に遷移する。
  */
 @Composable
 fun SplashScreen(onNavigateToMain: () -> Unit) {
@@ -51,14 +51,11 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
 
     LaunchedEffect(Unit) {
         isVisible = true
-        delay(SPLASH_DURATION_MS)
-        onNavigateToMain()
     }
 
     val isDark = isSystemInDarkTheme()
     val bgColor = if (isDark) DarkSplashBackground else SplashBackground
     val titleColor = if (isDark) DarkOnBackground else TextMedium
-    val subtitleColor = if (isDark) DarkOnBackground.copy(alpha = 0.8f) else TextLight
 
     Box(
         modifier = Modifier
@@ -77,7 +74,8 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(32.dp)
             ) {
                 // アプリアイコン代わりの大きな絵文字
                 Text(
@@ -98,16 +96,26 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
                     lineHeight = 56.sp
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(48.dp))
 
-                // サブタイトル
-                Text(
-                    text = stringResource(R.string.splash_subtitle),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = subtitleColor,
-                    textAlign = TextAlign.Center
-                )
+                // 大きなスタートボタン
+                Button(
+                    onClick = onNavigateToMain,
+                    modifier = Modifier
+                        .width(220.dp)
+                        .height(80.dp),
+                    shape = RoundedCornerShape(40.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = OrangePrimary,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "🎮 スタート！",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
             }
         }
     }
