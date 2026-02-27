@@ -143,8 +143,8 @@ fun MovingAnimalSprite(
 ) {
     val density = LocalDensity.current
     val animalSizePx = with(density) { animalSizeDp.toPx() }
-    val speedMin = if (isTablet) 1.5f else 3f
-    val speedMax = if (isTablet) 3f else 6f
+    val speedMin = 3f
+    val speedMax = 6f
 
     // 初期位置
     var posX by remember {
