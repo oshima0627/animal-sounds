@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        ダークモード用テーマ。
+        親テーマを Dark 系にすることでシステム UI（オーバースクロールや
+        ダイアログ等の Android デフォルト部品）がダーク外観になる。
+        windowBackground は values-night/colors.xml の splash_background で暗い暖色を使用する。
+    -->
+    <style name="Theme.AnimalSounds" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/splash_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

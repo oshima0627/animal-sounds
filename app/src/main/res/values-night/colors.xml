@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        ダークモード時の上書き定義。
+        themes.xml から参照される splash_background をダーク背景色に差し替えることで、
+        起動時のウィンドウ背景がダークテーマに対応する。
+    -->
+    <color name="splash_background">#FF2D1D17</color>
+</resources>

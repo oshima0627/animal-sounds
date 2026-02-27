@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">どうぶつさうんど</string>
-    <string name="splash_title">どうぶつさうんど</string>
+    <!-- スプラッシュ画面 -->
+    <string name="splash_emoji">🐾</string>
+    <string name="splash_title">どうぶつ\nさうんど</string>
     <string name="splash_subtitle">どうぶつをタッチしてね！</string>
-    <string name="main_title">どうぶつさうんど</string>
+
+    <!-- メイン画面 -->
+    <string name="main_title">どうぶつさうんど 🎵</string>
+
+    <!-- アクセシビリティ -->
+    <string name="animal_tap_hint">タップして鳴き声を聞く</string>
 
     <!-- 動物名 -->
     <string name="animal_dog">いぬ</string>
