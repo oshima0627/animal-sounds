@@ -12,13 +12,16 @@ class AnimalRepositoryTest {
 
     @Test
     fun animals_hasCorrectCount() {
-        assertEquals("動物は6匹であること", 6, animals.size)
+        assertEquals("動物は14匹であること", 14, animals.size)
     }
 
     @Test
     fun animals_containsAllExpectedIds() {
         val ids = animals.map { it.id }.toSet()
-        val expected = setOf("dog", "cat", "rabbit", "lion", "elephant", "giraffe")
+        val expected = setOf(
+            "dog", "cat", "horse", "cow", "chicken", "chick", "sheep", "goat",
+            "lion", "elephant", "wolf", "boar", "crow", "sparrow"
+        )
         assertEquals(expected, ids)
     }
 
