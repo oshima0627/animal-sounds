@@ -16,5 +16,6 @@ data class Animal(
     val soundText: String,
     val emoji: String,
     val backgroundColor: Long,
-    val soundResName: String
+    val soundResName: String,
+    val imageResName: String
 )
