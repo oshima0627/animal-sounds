@@ -75,6 +75,7 @@ fun MainScreen(
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
             val screenWidthPx = constraints.maxWidth.toFloat()
             val screenHeightPx = constraints.maxHeight.toFloat()
+            val isTablet = maxWidth >= 600.dp
 
             activeAnimals.forEach { activeAnimal ->
                 key(activeAnimal.instanceId) {
@@ -82,6 +83,7 @@ fun MainScreen(
                         activeAnimal = activeAnimal,
                         screenWidth = screenWidthPx,
                         screenHeight = screenHeightPx,
+                        isTablet = isTablet,
                         onClick = { animalViewModel.onAnimalClicked(activeAnimal.instanceId) }
                     )
                 }
@@ -101,10 +103,12 @@ fun MovingAnimalSprite(
     activeAnimal: ActiveAnimal,
     screenWidth: Float,
     screenHeight: Float,
+    isTablet: Boolean = false,
     onClick: () -> Unit
 ) {
     val density = LocalDensity.current
-    val animalSizePx = with(density) { 110.dp.toPx() }
+    val animalSizeDp = if (isTablet) (110 * 4).dp else 110.dp
+    val animalSizePx = with(density) { animalSizeDp.toPx() }
 
     // 初期位置
     var posX by remember {
@@ -114,9 +118,9 @@ fun MovingAnimalSprite(
         mutableStateOf(activeAnimal.initialY * (screenHeight - animalSizePx))
     }
 
-    // ランダム速度（方向もランダム）
-    val speedMin = 3f
-    val speedMax = 6f
+    // ランダム速度（方向もランダム）タブレットは半分のスピード
+    val speedMin = if (isTablet) 1.5f else 3f
+    val speedMax = if (isTablet) 3f else 6f
     var velX by remember {
         mutableStateOf(
             if (Random.nextBoolean()) Random.nextFloat() * (speedMax - speedMin) + speedMin
@@ -211,7 +215,7 @@ fun MovingAnimalSprite(
     Box(
         modifier = Modifier
             .offset { IntOffset(displayX.roundToInt(), displayY.roundToInt()) }
-            .size(110.dp)
+            .size(animalSizeDp)
             .rotate(rotation)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -228,12 +232,12 @@ fun MovingAnimalSprite(
                 Image(
                     painter = painterResource(id = imageResId),
                     contentDescription = activeAnimal.animal.nameJp,
-                    modifier = Modifier.size(76.dp)
+                    modifier = Modifier.size(if (isTablet) (76 * 4).dp else 76.dp)
                 )
             } else {
                 Text(
                     text = activeAnimal.animal.emoji,
-                    fontSize = 64.sp,
+                    fontSize = if (isTablet) (64 * 4).sp else 64.sp,
                     textAlign = TextAlign.Center
                 )
             }
@@ -241,7 +245,7 @@ fun MovingAnimalSprite(
             // 動物名
             Text(
                 text = activeAnimal.animal.nameJp,
-                fontSize = 14.sp,
+                fontSize = if (isTablet) (14 * 4).sp else 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF3E2723),
                 textAlign = TextAlign.Center
@@ -251,7 +255,7 @@ fun MovingAnimalSprite(
             if (activeAnimal.phase == AnimalPhase.SHAKING) {
                 Text(
                     text = activeAnimal.animal.soundText,
-                    fontSize = 13.sp,
+                    fontSize = if (isTablet) (13 * 4).sp else 13.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color(0xFFE65100),
                     textAlign = TextAlign.Center,
