@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,11 +52,29 @@ import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.random.Random
+
+/**
+ * 各動物の位置・速度を保持する。
+ * posX/posY は Compose ステートなので変化時に再コンポーズされる。
+ */
+private class AnimalPositionState(
+    initPosX: Float,
+    initPosY: Float,
+    initVelX: Float,
+    initVelY: Float,
+) {
+    var posX by mutableStateOf(initPosX)
+    var posY by mutableStateOf(initPosY)
+    var velX = initVelX
+    var velY = initVelY
+}
 
 /**
  * ゲーム画面。
  * 3匹の動物が自由に動き回り、タップすると鳴き声を鳴らして逃げる。
+ * 動物同士が重ならないよう衝突検出・反発を行う。
  */
 @Composable
 fun MainScreen(
@@ -76,16 +96,143 @@ fun MainScreen(
             val screenWidthPx = constraints.maxWidth.toFloat()
             val screenHeightPx = constraints.maxHeight.toFloat()
             val isTablet = maxWidth >= 600.dp
+            val density = LocalDensity.current
+            val animalSizeDp = if (isTablet) (110 * 4).dp else 110.dp
+            val animalSizePx = with(density) { animalSizeDp.toPx() }
+            val speedMin = if (isTablet) 1.5f else 3f
+            val speedMax = if (isTablet) 3f else 6f
 
+            // 全動物の位置・速度を一元管理（衝突検出のために共有）
+            val positionStates = remember { mutableStateMapOf<String, AnimalPositionState>() }
+
+            // 動物リストが変わったとき：新しい動物の状態を追加、消えた動物の状態を削除
+            LaunchedEffect(activeAnimals) {
+                val currentIds = activeAnimals.map { it.instanceId }.toSet()
+                positionStates.keys.retainAll(currentIds)
+                activeAnimals.forEach { animal ->
+                    if (animal.instanceId !in positionStates) {
+                        fun randVel() = if (Random.nextBoolean())
+                            Random.nextFloat() * (speedMax - speedMin) + speedMin
+                        else -(Random.nextFloat() * (speedMax - speedMin) + speedMin)
+
+                        positionStates[animal.instanceId] = AnimalPositionState(
+                            initPosX = animal.initialX * (screenWidthPx - animalSizePx),
+                            initPosY = animal.initialY * (screenHeightPx - animalSizePx),
+                            initVelX = randVel(),
+                            initVelY = randVel()
+                        )
+                    }
+                }
+            }
+
+            // MOVING 状態の動物IDリスト（フェーズが変わると再計算される）
+            val movingIds = remember(activeAnimals) {
+                activeAnimals.filter { it.phase == AnimalPhase.MOVING }.map { it.instanceId }
+            }
+
+            // 全 MOVING 動物を一つのループで更新（壁バウンド＋衝突検出）
+            LaunchedEffect(movingIds) {
+                while (true) {
+                    withFrameMillis {
+                        val states = movingIds.mapNotNull { id -> positionStates[id]?.let { id to it } }
+                        val maxX = screenWidthPx - animalSizePx
+                        val maxY = screenHeightPx - animalSizePx
+
+                        // 位置更新 + 壁バウンド
+                        states.forEach { (_, s) ->
+                            var nx = s.posX + s.velX
+                            var ny = s.posY + s.velY
+                            if (nx < 0f || nx > maxX) { s.velX = -s.velX; nx = nx.coerceIn(0f, maxX) }
+                            if (ny < 0f || ny > maxY) { s.velY = -s.velY; ny = ny.coerceIn(0f, maxY) }
+                            s.posX = nx
+                            s.posY = ny
+                        }
+
+                        // 動物同士の衝突検出・弾性反発
+                        for (i in states.indices) {
+                            for (j in i + 1 until states.size) {
+                                val s1 = states[i].second
+                                val s2 = states[j].second
+                                val cx1 = s1.posX + animalSizePx / 2f
+                                val cy1 = s1.posY + animalSizePx / 2f
+                                val cx2 = s2.posX + animalSizePx / 2f
+                                val cy2 = s2.posY + animalSizePx / 2f
+                                val dx = cx2 - cx1
+                                val dy = cy2 - cy1
+                                val distSq = dx * dx + dy * dy
+                                if (distSq < animalSizePx * animalSizePx && distSq > 0f) {
+                                    val dist = sqrt(distSq)
+                                    val normX = dx / dist
+                                    val normY = dy / dist
+                                    val dvx = s1.velX - s2.velX
+                                    val dvy = s1.velY - s2.velY
+                                    val dot = dvx * normX + dvy * normY
+                                    if (dot > 0f) { // 接近中のみ反発
+                                        s1.velX -= dot * normX
+                                        s1.velY -= dot * normY
+                                        s2.velX += dot * normX
+                                        s2.velY += dot * normY
+                                    }
+                                    // 重なり解消
+                                    val overlap = (animalSizePx - dist) / 2f
+                                    s1.posX -= normX * overlap
+                                    s1.posY -= normY * overlap
+                                    s2.posX += normX * overlap
+                                    s2.posY += normY * overlap
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 動物スプライトを描画
             activeAnimals.forEach { activeAnimal ->
                 key(activeAnimal.instanceId) {
-                    MovingAnimalSprite(
-                        activeAnimal = activeAnimal,
-                        screenWidth = screenWidthPx,
-                        screenHeight = screenHeightPx,
-                        isTablet = isTablet,
-                        onClick = { animalViewModel.onAnimalClicked(activeAnimal.instanceId) }
-                    )
+                    val posState = positionStates[activeAnimal.instanceId]
+                    if (posState != null) {
+                        MovingAnimalSprite(
+                            activeAnimal = activeAnimal,
+                            posX = posState.posX,
+                            posY = posState.posY,
+                            screenWidth = screenWidthPx,
+                            screenHeight = screenHeightPx,
+                            isTablet = isTablet,
+                            animalSizeDp = animalSizeDp,
+                            onClick = { animalViewModel.onAnimalClicked(activeAnimal.instanceId) }
+                        )
+                    }
+                }
+            }
+
+            // タップした動物の名前・鳴き声を画面中央に表示（揺れなし）
+            val shakingAnimal = activeAnimals.find { it.phase == AnimalPhase.SHAKING }
+            if (shakingAnimal != null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .background(Color(0xEEFFF9C4), RoundedCornerShape(24.dp))
+                            .padding(horizontal = 40.dp, vertical = 24.dp)
+                    ) {
+                        Text(
+                            text = shakingAnimal.animal.nameJp,
+                            fontSize = if (isTablet) 72.sp else 36.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF3E2723),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = shakingAnimal.animal.soundText,
+                            fontSize = if (isTablet) 64.sp else 32.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFFE65100),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -93,83 +240,31 @@ fun MainScreen(
 }
 
 /**
- * 画面上を自由に動き回る動物スプライト。
- * - MOVING: ランダムに画面内を移動（壁で跳ね返る）
- * - SHAKING: 揺れアニメーション＋鳴き声テキスト表示
+ * 動物スプライト。位置は親から受け取る。
+ * - MOVING: 親のループで移動（ここでは描画のみ）
+ * - SHAKING: 画像が揺れる（名前・鳴き声は画面中央に別表示）
  * - ESCAPING: ランダム方向に飛び出して消える
  */
 @Composable
 fun MovingAnimalSprite(
     activeAnimal: ActiveAnimal,
+    posX: Float,
+    posY: Float,
     screenWidth: Float,
     screenHeight: Float,
     isTablet: Boolean = false,
+    animalSizeDp: Dp,
     onClick: () -> Unit
 ) {
-    val density = LocalDensity.current
-    val animalSizeDp = if (isTablet) (110 * 4).dp else 110.dp
-    val animalSizePx = with(density) { animalSizeDp.toPx() }
-
-    // 初期位置
-    var posX by remember {
-        mutableStateOf(activeAnimal.initialX * (screenWidth - animalSizePx))
-    }
-    var posY by remember {
-        mutableStateOf(activeAnimal.initialY * (screenHeight - animalSizePx))
-    }
-
-    // ランダム速度（方向もランダム）タブレットは半分のスピード
-    val speedMin = if (isTablet) 1.5f else 3f
-    val speedMax = if (isTablet) 3f else 6f
-    var velX by remember {
-        mutableStateOf(
-            if (Random.nextBoolean()) Random.nextFloat() * (speedMax - speedMin) + speedMin
-            else -(Random.nextFloat() * (speedMax - speedMin) + speedMin)
-        )
-    }
-    var velY by remember {
-        mutableStateOf(
-            if (Random.nextBoolean()) Random.nextFloat() * (speedMax - speedMin) + speedMin
-            else -(Random.nextFloat() * (speedMax - speedMin) + speedMin)
-        )
-    }
-
-    // 逃げアニメーション用（Animatable）
+    // 逃げアニメーション用
     val escapeAnimX = remember { Animatable(posX) }
     val escapeAnimY = remember { Animatable(posY) }
 
-    // フェーズに応じた動き
     LaunchedEffect(activeAnimal.instanceId, activeAnimal.phase) {
         when (activeAnimal.phase) {
-            AnimalPhase.MOVING -> {
-                // フレームごとに位置を更新（壁で跳ね返る）
-                while (true) {
-                    withFrameMillis {
-                        var nx = posX + velX
-                        var ny = posY + velY
-                        val maxX = screenWidth - animalSizePx
-                        val maxY = screenHeight - animalSizePx
-
-                        if (nx < 0f || nx > maxX) {
-                            velX = -velX
-                            nx = nx.coerceIn(0f, maxX)
-                        }
-                        if (ny < 0f || ny > maxY) {
-                            velY = -velY
-                            ny = ny.coerceIn(0f, maxY)
-                        }
-                        posX = nx
-                        posY = ny
-                    }
-                }
-            }
-
-            AnimalPhase.SHAKING -> {
-                // 揺れ中は移動しない（位置固定）
-            }
-
+            AnimalPhase.MOVING -> { /* 移動は親のループで処理 */ }
+            AnimalPhase.SHAKING -> { /* 揺れ中は固定 */ }
             AnimalPhase.ESCAPING -> {
-                // 現在位置からランダム方向に飛び出す
                 val angle = activeAnimal.escapeAngle
                 val distance = maxOf(screenWidth, screenHeight) * 2f
                 escapeAnimX.snapTo(posX)
@@ -188,7 +283,6 @@ fun MovingAnimalSprite(
         }
     }
 
-    // 最終的な表示位置
     val displayX = if (activeAnimal.phase == AnimalPhase.ESCAPING) escapeAnimX.value else posX
     val displayY = if (activeAnimal.phase == AnimalPhase.ESCAPING) escapeAnimY.value else posY
 
@@ -213,6 +307,7 @@ fun MovingAnimalSprite(
     }
 
     Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .offset { IntOffset(displayX.roundToInt(), displayY.roundToInt()) }
             .size(animalSizeDp)
@@ -223,57 +318,24 @@ fun MovingAnimalSprite(
                 onClick = onClick
             )
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // 動物画像（またはフォールバックとして絵文字）
-            if (imageResId != 0) {
-                Image(
-                    painter = painterResource(id = imageResId),
-                    contentDescription = activeAnimal.animal.nameJp,
-                    modifier = Modifier.size(if (isTablet) (76 * 4).dp else 76.dp)
-                )
-            } else {
-                Text(
-                    text = activeAnimal.animal.emoji,
-                    fontSize = if (isTablet) (64 * 4).sp else 64.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            // 動物名
+        if (imageResId != 0) {
+            Image(
+                painter = painterResource(id = imageResId),
+                contentDescription = activeAnimal.animal.nameJp,
+                modifier = Modifier.size(if (isTablet) (76 * 4).dp else 76.dp)
+            )
+        } else {
             Text(
-                text = activeAnimal.animal.nameJp,
-                fontSize = if (isTablet) (14 * 4).sp else 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF3E2723),
+                text = activeAnimal.animal.emoji,
+                fontSize = if (isTablet) (64 * 4).sp else 64.sp,
                 textAlign = TextAlign.Center
             )
-
-            // 鳴き声テキスト（SHAKING時のみ表示）
-            if (activeAnimal.phase == AnimalPhase.SHAKING) {
-                Text(
-                    text = activeAnimal.animal.soundText,
-                    fontSize = if (isTablet) (13 * 4).sp else 13.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFFE65100),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .background(
-                            Color(0xFFFFF9C4),
-                            RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                )
-            }
         }
     }
 }
 
 /**
  * フレームごとに処理を実行するユーティリティ。
- * Compose の withFrameMillis をラップして使いやすくする。
  */
 private suspend fun withFrameMillis(block: () -> Unit) {
     androidx.compose.runtime.withFrameMillis { block() }
