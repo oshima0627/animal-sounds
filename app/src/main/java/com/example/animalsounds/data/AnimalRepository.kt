@@ -17,7 +17,8 @@ object AnimalRepository {
             soundText = "ワンワン！",
             emoji = "🐕",
             backgroundColor = 0xFFFFD7A8,
-            soundResName = "sound_dog"
+            soundResName = "sound_dog",
+            imageResName = "img_dog"
         ),
         Animal(
             id = "cat",
@@ -25,7 +26,8 @@ object AnimalRepository {
             soundText = "ニャーニャー！",
             emoji = "🐈",
             backgroundColor = 0xFFFFB3C6,
-            soundResName = "sound_cat"
+            soundResName = "sound_cat",
+            imageResName = "img_cat"
         ),
         Animal(
             id = "horse",
@@ -33,7 +35,8 @@ object AnimalRepository {
             soundText = "ヒヒーン！",
             emoji = "🐴",
             backgroundColor = 0xFFC8A070,
-            soundResName = "sound_horse"
+            soundResName = "sound_horse",
+            imageResName = "img_horse"
         ),
         Animal(
             id = "cow",
@@ -41,7 +44,8 @@ object AnimalRepository {
             soundText = "モーモー！",
             emoji = "🐄",
             backgroundColor = 0xFFF0F0E8,
-            soundResName = "sound_cow"
+            soundResName = "sound_cow",
+            imageResName = "img_cow"
         ),
         Animal(
             id = "chicken",
@@ -49,7 +53,8 @@ object AnimalRepository {
             soundText = "コケコッコ！",
             emoji = "🐓",
             backgroundColor = 0xFFFFCC80,
-            soundResName = "sound_chicken"
+            soundResName = "sound_chicken",
+            imageResName = "img_chicken"
         ),
         Animal(
             id = "chick",
@@ -57,7 +62,8 @@ object AnimalRepository {
             soundText = "ピヨピヨ！",
             emoji = "🐥",
             backgroundColor = 0xFFFFE860,
-            soundResName = "sound_chick"
+            soundResName = "sound_chick",
+            imageResName = "img_chick"
         ),
         Animal(
             id = "sheep",
@@ -65,7 +71,8 @@ object AnimalRepository {
             soundText = "メェーメェー！",
             emoji = "🐑",
             backgroundColor = 0xFFE0E8E0,
-            soundResName = "sound_sheep"
+            soundResName = "sound_sheep",
+            imageResName = "img_sheep"
         ),
         Animal(
             id = "goat",
@@ -73,7 +80,8 @@ object AnimalRepository {
             soundText = "メーメー！",
             emoji = "🐐",
             backgroundColor = 0xFFDDD8B8,
-            soundResName = "sound_goat"
+            soundResName = "sound_goat",
+            imageResName = "img_goat"
         ),
         // ── 野生動物 ──────────────────────────────────────────────
         Animal(
@@ -82,7 +90,8 @@ object AnimalRepository {
             soundText = "ガオー！",
             emoji = "🦁",
             backgroundColor = 0xFFFFF0A8,
-            soundResName = "sound_lion"
+            soundResName = "sound_lion",
+            imageResName = "img_lion"
         ),
         Animal(
             id = "elephant",
@@ -90,7 +99,8 @@ object AnimalRepository {
             soundText = "パオーン！",
             emoji = "🐘",
             backgroundColor = 0xFFD8D0F0,
-            soundResName = "sound_elephant"
+            soundResName = "sound_elephant",
+            imageResName = "img_elephant"
         ),
         Animal(
             id = "wolf",
@@ -98,7 +108,8 @@ object AnimalRepository {
             soundText = "アオーン！",
             emoji = "🐺",
             backgroundColor = 0xFF9AABBC,
-            soundResName = "sound_wolf"
+            soundResName = "sound_wolf",
+            imageResName = "img_wolf"
         ),
         Animal(
             id = "boar",
@@ -106,7 +117,8 @@ object AnimalRepository {
             soundText = "ブヒブヒ！",
             emoji = "🐗",
             backgroundColor = 0xFFD4A07A,
-            soundResName = "sound_boar"
+            soundResName = "sound_boar",
+            imageResName = "img_boar"
         ),
         Animal(
             id = "crow",
@@ -114,7 +126,8 @@ object AnimalRepository {
             soundText = "カーカー！",
             emoji = "🐦‍⬛",
             backgroundColor = 0xFF8898A8,
-            soundResName = "sound_crow"
+            soundResName = "sound_crow",
+            imageResName = "img_crow"
         ),
         Animal(
             id = "sparrow",
@@ -122,7 +135,8 @@ object AnimalRepository {
             soundText = "チュンチュン！",
             emoji = "🐦",
             backgroundColor = 0xFFD0B890,
-            soundResName = "sound_sparrow"
+            soundResName = "sound_sparrow",
+            imageResName = "img_sparrow"
         )
     )
 }
