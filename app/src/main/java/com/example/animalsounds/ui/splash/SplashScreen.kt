@@ -102,17 +102,17 @@ fun SplashScreen(onNavigateToMain: () -> Unit) {
                 Button(
                     onClick = onNavigateToMain,
                     modifier = Modifier
-                        .width(220.dp)
-                        .height(80.dp),
-                    shape = RoundedCornerShape(40.dp),
+                        .width(300.dp)
+                        .height(100.dp),
+                    shape = RoundedCornerShape(50.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = OrangePrimary,
                         contentColor = Color.White
                     )
                 ) {
                     Text(
-                        text = "🎮 スタート！",
-                        fontSize = 28.sp,
+                        text = "スタート！",
+                        fontSize = 36.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }
