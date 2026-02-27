@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -146,12 +147,24 @@ fun MovingAnimalSprite(
     val speedMin = 3f
     val speedMax = 6f
 
+    // 画面サイズの最新値を常に参照できるようにする（画面回転対応）
+    val currentScreenWidth by rememberUpdatedState(screenWidth)
+    val currentScreenHeight by rememberUpdatedState(screenHeight)
+
     // 初期位置
     var posX by remember {
         mutableStateOf(activeAnimal.initialX * (screenWidth - animalSizePx))
     }
     var posY by remember {
         mutableStateOf(activeAnimal.initialY * (screenHeight - animalSizePx))
+    }
+
+    // 画面サイズ変更時（回転など）に位置を新しい範囲内に収める
+    LaunchedEffect(screenWidth, screenHeight) {
+        val maxX = screenWidth - animalSizePx
+        val maxY = screenHeight - animalSizePx
+        posX = posX.coerceIn(0f, maxX)
+        posY = posY.coerceIn(0f, maxY)
     }
 
     // ランダム速度（方向もランダム）タブレットは半分のスピード
@@ -181,8 +194,8 @@ fun MovingAnimalSprite(
                     withFrameMillis {
                         var nx = posX + velX
                         var ny = posY + velY
-                        val maxX = screenWidth - animalSizePx
-                        val maxY = screenHeight - animalSizePx
+                        val maxX = currentScreenWidth - animalSizePx
+                        val maxY = currentScreenHeight - animalSizePx
 
                         if (nx < 0f || nx > maxX) {
                             velX = -velX
@@ -205,7 +218,7 @@ fun MovingAnimalSprite(
             AnimalPhase.ESCAPING -> {
                 // 現在位置からランダム方向に飛び出す
                 val angle = activeAnimal.escapeAngle
-                val distance = maxOf(screenWidth, screenHeight) * 2f
+                val distance = maxOf(currentScreenWidth, currentScreenHeight) * 2f
                 escapeAnimX.snapTo(posX)
                 escapeAnimY.snapTo(posY)
                 launch {
