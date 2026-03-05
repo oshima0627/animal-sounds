@@ -98,6 +98,12 @@ class AnimalViewModel(application: Application) : AndroidViewModel(application) 
      * 鳴き声再生 → 揺れ → 逃げる → 新しい動物が出現
      */
     fun onAnimalClicked(instanceId: String) {
+        // いずれかの動物が鳴いている（SHAKING / ESCAPING）間は全タップを無視する
+        val isBusy = _activeAnimals.value.any {
+            it.phase == AnimalPhase.SHAKING || it.phase == AnimalPhase.ESCAPING
+        }
+        if (isBusy) return
+
         val animal = _activeAnimals.value.find { it.instanceId == instanceId } ?: return
         if (animal.phase != AnimalPhase.MOVING) return
 
